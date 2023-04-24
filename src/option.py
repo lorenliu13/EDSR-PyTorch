@@ -29,12 +29,15 @@ parser.add_argument('--data_test', type=str, default='DIV2K',
                     help='test dataset name')
 parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
+# this data_range only applies to div2k that needs a data range.
+
 parser.add_argument('--ext', type=str, default='sep',
                     help='dataset file extension')
 parser.add_argument('--scale', type=str, default='4',
                     help='super resolution scale')
 parser.add_argument('--patch_size', type=int, default=192,
-                    help='output patch size')
+                    help='output patch size') # Patch size refers to the dimensions of a smaller, contiguous portion of an image that is extracted for processing
+# the lower resolution image dimension is used to determine the max boundary of a patch
 parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=3,

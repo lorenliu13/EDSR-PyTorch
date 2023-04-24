@@ -3,7 +3,7 @@ from data import srdata
 
 class DIV2K(srdata.SRData):
     def __init__(self, args, name='DIV2K', train=True, benchmark=False):
-        data_range = [r.split('-') for r in args.data_range.split('/')]
+        data_range = [r.split('-') for r in args.data_range.split('/')] # set up the data range
         if train:
             data_range = data_range[0]
         else:
