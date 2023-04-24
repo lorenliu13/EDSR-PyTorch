@@ -28,13 +28,15 @@ class EDSR(nn.Module):
             self.url = url[url_name]
         else:
             self.url = None
-        self.sub_mean = common.MeanShift(args.rgb_range)
-        self.add_mean = common.MeanShift(args.rgb_range, sign=1)
+        self.sub_mean = common.MeanShift(args.rgb_range) # an instance of MeanShift class to normalize the input image
+        self.add_mean = common.MeanShift(args.rgb_range, sign=1) # denormalize the input image data
 
-        # define head module
+        # define head module, a convolutional layer with (n_colors input channels, n_feats output channels, and a kernel size of "kernel_size")
         m_head = [conv(args.n_colors, n_feats, kernel_size)]
 
-        # define body module
+        # define body module, a sequence of residual blocks
+        # it contains 2 convolutional layers with the same number of channels (n_feats)
+        # the residual block also include ReLu activations and a rescaling factor
         m_body = [
             common.ResBlock(
                 conv, n_feats, kernel_size, act=act, res_scale=args.res_scale
@@ -43,6 +45,7 @@ class EDSR(nn.Module):
         m_body.append(conv(n_feats, n_feats, kernel_size))
 
         # define tail module
+        # contains unsampling layer by a convolution layers with n_colors (e.g., 3 for RGB)
         m_tail = [
             common.Upsampler(conv, scale, n_feats, act=False),
             conv(n_feats, args.n_colors, kernel_size)
@@ -53,14 +56,14 @@ class EDSR(nn.Module):
         self.tail = nn.Sequential(*m_tail)
 
     def forward(self, x):
-        x = self.sub_mean(x)
+        # x = self.sub_mean(x) # remove the normalize part.
         x = self.head(x)
 
         res = self.body(x)
         res += x
 
         x = self.tail(res)
-        x = self.add_mean(x)
+        # x = self.add_mean(x)
 
         return x 
 

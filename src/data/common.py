@@ -39,9 +39,10 @@ def get_patch(*args, patch_size=96, scale=2, multi=False, input_large=False):
 
     # extract patches from the input images and store them in the ret list.
     ret = [
-        args[0][iy:iy + ip, ix:ix + ip, :],
-        *[a[ty:ty + tp, tx:tx + tp, :] for a in args[1:]]
+        args[0][iy:iy + ip, ix:ix + ip],
+        *[a[ty:ty + tp, tx:tx + tp] for a in args[1:]]
     ]
+    # This is for two dimensional array
 
     return ret
 
@@ -101,9 +102,12 @@ def augment(*args, hflip=True, rot=True):
     rot90 = rot and random.random() < 0.5
 
     def _augment(img):
-        if hflip: img = img[:, ::-1, :]
-        if vflip: img = img[::-1, :, :]
-        if rot90: img = img.transpose(1, 0, 2)
+        """
+        This is only for 2-d images
+        """
+        if hflip: img = img[:, ::-1]
+        if vflip: img = img[::-1, :]
+        if rot90: img = img.transpose(1, 0)
         
         return img
 

@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 class Trainer():
     def __init__(self, args, loader, my_model, my_loss, ckp):
-        self.args = args
+        self.args = args # configuration augments
         self.scale = args.scale
 
         self.ckp = ckp
@@ -26,29 +26,30 @@ class Trainer():
         self.error_last = 1e8
 
     def train(self):
+        # handles the training loop for the model
         self.loss.step()
         epoch = self.optimizer.get_last_epoch() + 1
-        lr = self.optimizer.get_lr()
+        lr = self.optimizer.get_lr() # update the learning rate
 
         self.ckp.write_log(
             '[Epoch {}]\tLearning rate: {:.2e}'.format(epoch, Decimal(lr))
-        )
+        ) # log the learning rate
         self.loss.start_log()
-        self.model.train()
+        self.model.train() # set the model to raining mode
 
         timer_data, timer_model = utility.timer(), utility.timer()
         # TEMP
         self.loader_train.dataset.set_scale(0)
-        for batch, (lr, hr, _,) in enumerate(self.loader_train):
-            lr, hr = self.prepare(lr, hr)
+        for batch, (lr, hr, _,) in enumerate(self.loader_train): # loop through the batches of the training dataset
+            lr, hr = self.prepare(lr, hr) # prepare lr and hr images
             timer_data.hold()
             timer_model.tic()
 
             self.optimizer.zero_grad()
-            sr = self.model(lr, 0)
-            loss = self.loss(sr, hr)
-            loss.backward()
-            if self.args.gclip > 0:
+            sr = self.model(lr, 0) # forward process to get super-resolution images
+            loss = self.loss(sr, hr) # compute the loess
+            loss.backward() # backward propagation to optimize the parameters
+            if self.args.gclip > 0: # optionally apply gradient clipping to avoid exploding gradients
                 utils.clip_grad_value_(
                     self.model.parameters(),
                     self.args.gclip
@@ -56,7 +57,7 @@ class Trainer():
             self.optimizer.step()
 
             timer_model.hold()
-
+            # log the training progress periodically
             if (batch + 1) % self.args.print_every == 0:
                 self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s'.format(
                     (batch + 1) * self.args.batch_size,
