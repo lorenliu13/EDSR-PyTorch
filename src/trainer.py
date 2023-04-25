@@ -1,6 +1,7 @@
 import os
 import math
 from decimal import Decimal
+from datetime import datetime
 
 import utility
 
@@ -31,8 +32,11 @@ class Trainer():
         epoch = self.optimizer.get_last_epoch() + 1
         lr = self.optimizer.get_lr() # update the learning rate
 
+        # Get the current time
+        current_time = datetime.now()
+
         self.ckp.write_log(
-            '[Epoch {}]\tLearning rate: {:.2e}'.format(epoch, Decimal(lr))
+            '[Epoch {}]\tLearning rate: {:.2e}\t{}'.format(epoch, Decimal(lr), current_time)
         ) # log the learning rate
         self.loss.start_log()
         self.model.train() # set the model to raining mode
@@ -59,12 +63,17 @@ class Trainer():
             timer_model.hold()
             # log the training progress periodically
             if (batch + 1) % self.args.print_every == 0: # every 1000 batches print a learning result
-                self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s'.format(
+
+                # Get the current time
+                current_time = datetime.now()
+
+                self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s\t{}'.format(
                     (batch + 1) * self.args.batch_size, # total number of samples processed by the model upto the current batch
                     len(self.loader_train.dataset), # the length of current train dataset
                     self.loss.display_loss(batch),
                     timer_model.release(),
-                    timer_data.release()))
+                    timer_data.release(),
+                    current_time))
 
             timer_data.tic()
 

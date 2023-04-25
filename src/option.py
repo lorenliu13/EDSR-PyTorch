@@ -37,7 +37,8 @@ parser.add_argument('--scale', type=str, default='4',
                     help='super resolution scale')
 parser.add_argument('--patch_size', type=int, default=192,
                     help='output patch size') # Patch size refers to the dimensions of a smaller, contiguous portion of an image that is extracted for processing
-# the lower resolution image dimension is used to determine the max boundary of a patch
+# the high resolution image dimension is used to determine the max boundary of a patch
+# in other words, select a patch from the high-resolution image, and find the counterpart in low resolution image
 parser.add_argument('--rgb_range', type=int, default=1,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=1,
