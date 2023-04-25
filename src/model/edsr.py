@@ -28,8 +28,8 @@ class EDSR(nn.Module):
             self.url = url[url_name]
         else:
             self.url = None
-        self.sub_mean = common.MeanShift(args.rgb_range) # an instance of MeanShift class to normalize the input image
-        self.add_mean = common.MeanShift(args.rgb_range, sign=1) # denormalize the input image data
+        # self.sub_mean = common.MeanShift(args.rgb_range) # an instance of MeanShift class to normalize the input image
+        # self.add_mean = common.MeanShift(args.rgb_range, sign=1) # denormalize the input image data
 
         # define head module, a convolutional layer with (n_colors input channels, n_feats output channels, and a kernel size of "kernel_size")
         m_head = [conv(args.n_colors, n_feats, kernel_size)]
