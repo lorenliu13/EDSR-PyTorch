@@ -46,7 +46,8 @@ def bg_target(queue):
         if not queue.empty():
             filename, tensor = queue.get()
             if filename is None: break
-            imageio.imwrite(filename, tensor.numpy())
+            np.save(filename, tensor.numpy()) # save as npy file
+            # imageio.imwrite(filename, tensor.numpy())
 
 class checkpoint():
     def __init__(self, args):
@@ -149,37 +150,51 @@ class checkpoint():
         for p in self.process: p.join()
 
     def save_results(self, dataset, filename, save_list, scale):
-        if self.args.save_results:
+        """
+        Save the results of the super-resolution process
+        dataset:
+        filename:
+        save_list: a list containing tensors of sr, lr, and hr images
+        scale: scale factor for super resolution
+        """
+        if self.args.save_results: # if save_results flag is set
             filename = self.get_path(
                 'results-{}'.format(dataset.dataset.name),
                 '{}_x{}_'.format(filename, scale)
-            )
+            ) # generate appropriate file name
 
             postfix = ('SR', 'LR', 'HR')
             for v, p in zip(save_list, postfix):
-                normalized = v[0].mul(255 / self.args.rgb_range)
-                tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
-                self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+                normalized = v[0] # no need to normalize it
+                tensor_cpu = normalized.permute(1, 2, 0).cpu() # change the order of dimensions, placing the channel dim last
+                self.queue.put(('{}{}.npy'.format(filename, p), tensor_cpu))
 
 def quantize(img, rgb_range):
+    """
+    1. Calculate the pixel range
+    2. Multiple the input image tensor by the pixel range
+    3. Clamp the result between 0 to 255
+    4. Round the tensor values to the nearest integer
+    5. Divide the rounded tensor values by the pixel range to obtain the quantized image tensor in the original RGB range.
+    """
     pixel_range = 255 / rgb_range
     return img.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
 
 def calc_psnr(sr, hr, scale, rgb_range, dataset=None):
-    if hr.nelement() == 1: return 0
+    if hr.nelement() == 1: return 0 # check if the number of elements in hr is 1, if so return 0
 
-    diff = (sr - hr) / rgb_range
-    if dataset and dataset.dataset.benchmark:
+    diff = (sr - hr) / rgb_range # the difference between sr and hr images
+    if dataset and dataset.dataset.benchmark: # if the dataset is a bench mark dataset, convert the difference to a single channel img
         shave = scale
         if diff.size(1) > 1:
             gray_coeffs = [65.738, 129.057, 25.064]
             convert = diff.new_tensor(gray_coeffs).view(1, 3, 1, 1) / 256
             diff = diff.mul(convert).sum(dim=1)
     else:
-        shave = scale + 6
+        shave = scale + 6 # shave = scale + 6
 
-    valid = diff[..., shave:-shave, shave:-shave]
-    mse = valid.pow(2).mean()
+    valid = diff[..., shave:-shave, shave:-shave] # remove the some pixels from each board to obtain the valid region
+    mse = valid.pow(2).mean() # compute the mean square error of the difference
 
     return -10 * math.log10(mse)
 

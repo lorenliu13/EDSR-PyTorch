@@ -39,8 +39,8 @@ def get_patch(*args, patch_size=96, scale=2, multi=False, input_large=False):
 
     # extract patches from the input images and store them in the ret list.
     ret = [
-        args[0][iy:iy + ip, ix:ix + ip],
-        *[a[ty:ty + tp, tx:tx + tp] for a in args[1:]]
+        args[0][iy:iy + ip, ix:ix + ip], # extract a patch from the first lr image with size ip
+        *[a[ty:ty + tp, tx:tx + tp] for a in args[1:]] # extract patches from hr images with size tp
     ]
     # This is for two dimensional array
 

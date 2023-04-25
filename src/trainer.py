@@ -58,9 +58,9 @@ class Trainer():
 
             timer_model.hold()
             # log the training progress periodically
-            if (batch + 1) % self.args.print_every == 0: # every 100 batches print a learning result
+            if (batch + 1) % self.args.print_every == 0: # every 1000 batches print a learning result
                 self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s'.format(
-                    (batch + 1) * self.args.batch_size,
+                    (batch + 1) * self.args.batch_size, # total number of samples processed by the model upto the current batch
                     len(self.loader_train.dataset), # the length of current train dataset
                     self.loss.display_loss(batch),
                     timer_model.release(),
@@ -73,26 +73,27 @@ class Trainer():
         self.optimizer.schedule()
 
     def test(self):
-        torch.set_grad_enabled(False)
+        torch.set_grad_enabled(False) # disable gradient computation to save memory
 
-        epoch = self.optimizer.get_last_epoch()
+        epoch = self.optimizer.get_last_epoch() # retrieve the last epoch of the optimizer
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(
             torch.zeros(1, len(self.loader_test), len(self.scale))
         )
-        self.model.eval()
+        self.model.eval() # set the model to evaluation mode
 
         timer_test = utility.timer()
-        if self.args.save_results: self.ckp.begin_background()
-        for idx_data, d in enumerate(self.loader_test):
-            for idx_scale, scale in enumerate(self.scale):
-                d.dataset.set_scale(idx_scale)
-                for lr, hr, filename in tqdm(d, ncols=80):
+        if self.args.save_results: self.ckp.begin_background() # if save_results is ture, start to save results in the background
+        for idx_data, d in enumerate(self.loader_test): # iterate over the test datasets
+            for idx_scale, scale in enumerate(self.scale): # iterate over the scales
+                d.dataset.set_scale(idx_scale) # set the current scale
+                for lr, hr, filename in tqdm(d, ncols=80): # prepare lr and hr images
                     lr, hr = self.prepare(lr, hr)
-                    sr = self.model(lr, idx_scale)
-                    sr = utility.quantize(sr, self.args.rgb_range)
+                    sr = self.model(lr, idx_scale) # obtain the super resolution image
+                    # sr = utility.quantize(sr, self.args.rgb_range) # no need for this step
 
                     save_list = [sr]
+                    # calculate the psnr
                     self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
