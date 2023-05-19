@@ -19,7 +19,7 @@ class aorc512_test_log(srdata_era.SRData):
         )
 
     def _set_filesystem(self, dir_data):
-        self.apath = os.path.join(dir_data, 'aorc_128_512_test_log')
+        self.apath = os.path.join(dir_data, 'aorc_128_512_test_self_log')
         self.dir_hr = os.path.join(self.apath, 'hr_512')
         if self.input_large:
             self.dir_lr = os.path.join(self.apath, 'lr_128')
