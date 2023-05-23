@@ -8,13 +8,13 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-class era32_test(srdata_era.SRData):
+class era128_test(srdata_era.SRData):
     """
     Define a class to load .npy data for 32 to 128 task
     """
 
     def __init__(self, args, name='', train=True, benchmark=True):
-        super(era32_test, self).__init__(
+        super(era128_test, self).__init__(
             args, name=name, train=train, benchmark=True
         )
 
