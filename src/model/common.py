@@ -63,10 +63,19 @@ class ResBlock(nn.Module):
 class Upsampler(nn.Sequential):
     def __init__(self, conv, scale, n_feats, bn=False, act=False, bias=True):
 
+        """
+        Construct 2^n scale, i.e., n upsampling blocks
+        each block contains a convolution layer and a pixel shuffle operation (increase resolution by 2)
+
+        """
         m = []
         if (scale & (scale - 1)) == 0:    # Is scale = 2^n?
             for _ in range(int(math.log(scale, 2))):
                 m.append(conv(n_feats, 4 * n_feats, 3, bias))
+                # n_feats: the number of input channels (features)
+                # 4*n_feats: the number of output channel
+                # 3: kernel size
+                # bias: whether the conv layer should include a bias term
                 m.append(nn.PixelShuffle(2))
                 if bn:
                     m.append(nn.BatchNorm2d(n_feats))

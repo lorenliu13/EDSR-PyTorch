@@ -33,6 +33,9 @@ class EDSR(nn.Module):
 
         # define head module, a convolutional layer with (n_colors input channels, n_feats output channels, and a kernel size of "kernel_size")
         m_head = [conv(args.n_colors, n_feats, kernel_size)]
+        # head conv layer:
+            # input: n_colors
+            # output: n_features
 
         # define body module, a sequence of residual blocks
         # it contains 2 convolutional layers with the same number of channels (n_feats)
@@ -50,6 +53,8 @@ class EDSR(nn.Module):
             common.Upsampler(conv, scale, n_feats, act=False),
             conv(n_feats, args.n_colors, kernel_size)
         ]
+
+        # tail conv layer: input n_features, output n_colors, kernel_size 3
 
         self.head = nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)
