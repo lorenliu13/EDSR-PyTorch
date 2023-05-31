@@ -102,10 +102,11 @@ class Trainer():
                     # sr = utility.quantize(sr, self.args.rgb_range) # no need for this step
 
                     save_list = [sr]
-                    # calculate the psnr
-                    self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
-                        sr, hr, scale, self.args.rgb_range, dataset=d
-                    )
+                    if not self.args.skip_psnr:
+                        # calculate the psnr
+                        self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
+                            sr, hr, scale, self.args.rgb_range, dataset=d
+                        )
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
 

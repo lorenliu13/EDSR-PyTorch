@@ -1,5 +1,12 @@
+# Run test model prediction on CESM2 32 to 128
+python main.py --model EDSR --skip_psnr --save era5_32_128_test --save_results --scale 4 --patch_size 128 --n_feats 256 --res_scale 0.1 --n_resblocks 32 --pre_train trained_models/era5_32_128/exp_7709_era_32_128_E300.pt --test_only --data_test era128_test
+
+# Run test model prediction on CESM2 from 32 to 256
+python main.py --model EDSR --skip_psnr --save aorc_32_256_test --save_results --scale 8 --patch_size 256 --n_feats 256 --res_scale 0.1 --n_resblocks 32 --pre_train trained_models/aorc_32_256/exp_7866_aorc_32_256_log_E300.pt --test_only --data_test aorc256_test_log
+
+
 # EDSR baseline model (x2) + JPEG augmentation
-python main.py --model EDSR --scale 2 --patch_size 96 --save edsr_baseline_x2 --reset
+# python main.py --model EDSR --scale 2 --patch_size 96 --save edsr_baseline_x2 --reset
 #python main.py --model EDSR --scale 2 --patch_size 96 --save edsr_baseline_x2 --reset --data_train DIV2K+DIV2K-Q75 --data_test DIV2K+DIV2K-Q75
 
 # EDSR baseline model (x3) - from EDSR baseline model (x2)
