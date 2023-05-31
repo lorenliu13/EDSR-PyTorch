@@ -14,7 +14,7 @@ class era_128_aorc_128_train(srdata_era.SRData):
     """
 
     def __init__(self, args, name='', train=True, benchmark=True):
-        super(aorc128_train, self).__init__(
+        super(era_128_aorc_128_train, self).__init__(
             args, name=name, train=train, benchmark=True
         )
 
