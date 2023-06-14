@@ -46,7 +46,13 @@ def bg_target(queue):
         if not queue.empty():
             filename, tensor = queue.get()
             if filename is None: break
-            np.save(filename, tensor.numpy()) # save as npy file
+            # convert the saved numpy array to int8
+            saved_numpy_array = tensor.numpy()
+            # convert to 0 to 255, int8
+            saved_numpy_array = saved_numpy_array * 255
+            saved_numpy_array = saved_numpy_array.astype(np.int8)
+
+            np.save(filename, saved_numpy_array) # save as npy file
             # imageio.imwrite(filename, tensor.numpy())
 
 class checkpoint():
