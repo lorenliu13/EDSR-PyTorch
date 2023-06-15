@@ -50,7 +50,7 @@ def bg_target(queue):
             saved_numpy_array = tensor.numpy()
             # rescale to 0 and 1
             saved_numpy_array[saved_numpy_array < 0] = 0
-            saved_numpy_array[saved_numpy_array > 1] = 0
+            saved_numpy_array[saved_numpy_array > 1] = 1
             # convert to 0 to 255, int8
             saved_numpy_array = saved_numpy_array * 255
             saved_numpy_array = saved_numpy_array.astype(np.uint8) # save it as unsigned int
