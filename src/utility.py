@@ -48,9 +48,12 @@ def bg_target(queue):
             if filename is None: break
             # convert the saved numpy array to int8
             saved_numpy_array = tensor.numpy()
+            # rescale to 0 and 1
+            saved_numpy_array[saved_numpy_array < 0] = 0
+            saved_numpy_array[saved_numpy_array > 1] = 0
             # convert to 0 to 255, int8
             saved_numpy_array = saved_numpy_array * 255
-            saved_numpy_array = saved_numpy_array.astype(np.int8)
+            saved_numpy_array = saved_numpy_array.astype(np.uint8) # save it as unsigned int
 
             np.save(filename, saved_numpy_array) # save as npy file
             # imageio.imwrite(filename, tensor.numpy())
