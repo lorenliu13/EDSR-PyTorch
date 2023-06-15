@@ -7,6 +7,8 @@ import numpy as np
 
 import torch
 import torch.utils.data as data
+import glob
+
 
 class aorc256_test_log(srdata_era.SRData):
     """
@@ -19,7 +21,10 @@ class aorc256_test_log(srdata_era.SRData):
         )
 
     def _set_filesystem(self, dir_data):
-        self.apath = os.path.join(dir_data, 'aorc_32_256_test_self_log')
+        matching_directories = glob.glob(os.path.join(dir_data, '*aorc_32_256_test_self_log')) # * is the wild card for ensemble year and id
+        # glob.glob will return a list
+        # take the first match
+        self.apath = matching_directories[0]
         self.dir_hr = os.path.join(self.apath, 'lr_32')
         if self.input_large:
             self.dir_lr = os.path.join(self.apath, 'lr_32')
