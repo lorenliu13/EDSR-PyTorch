@@ -26,7 +26,7 @@ class era128_test(srdata_era.SRData):
         # take the first match
         self.apath = matching_directories[0]
         # self.apath = os.path.join(dir_data, 'era5_32_128_test')
-        self.dir_hr = os.path.join(self.apath, 'lr_32')
+        self.dir_hr = os.path.join(self.apath, 'hr_128')
         if self.input_large:
             self.dir_lr = os.path.join(self.apath, 'lr_32')
         else:
